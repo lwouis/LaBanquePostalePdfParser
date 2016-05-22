@@ -1,0 +1,59 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
+    id "co.riiid.gradle" version "0.4.2"
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'application'
+
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.9'
+}
+
+repositories {
+    mavenCentral()
+    maven { url "https://jitpack.io" }
+}
+
+dependencies {
+    compile 'org.apache.pdfbox:pdfbox:2.0.1'
+    compile 'org.bouncycastle:bcprov-jdk16:1.46'
+    compile 'org.bouncycastle:bcmail-jdk16:1.46'
+    compile 'com.github.thoqbk:traprange:c04fecc'
+}
+
+mainClassName = "com.lwouis.labanquepostale_pdf_parser.Main"
+
+jar {
+    manifest { attributes "Main-Class": mainClassName }
+    doFirst {
+        from(configurations.runtime.resolve().collect { it.isDirectory() ? it : zipTree(it) }) {
+            exclude 'META-INF/MANIFEST.MF'
+            exclude 'META-INF/*.SF'
+            exclude 'META-INF/*.DSA'
+            exclude 'META-INF/*.RSA'
+        }
+    }
+}
+
+github {
+    owner = 'lwouis'
+    repo = 'LaBanquePostalePdfParser'
+    token = githubToken
+    tagName = 'v1.0.0'
+    name = github.tagName
+    assets = [
+            'build/distributions/LaBanquePostalePdfParser.zip',
+            'build/libs/LaBanquePostalePdfParser.jar',
+    ]
+}
+
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}

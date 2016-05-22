@@ -1,0 +1,1 @@
+Put the PDF files you want to parse in this folder, then run the app

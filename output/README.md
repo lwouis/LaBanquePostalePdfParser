@@ -1,0 +1,1 @@
+You will find the consolidated CSV file in this folder, after the app has run
