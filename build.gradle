@@ -1,54 +1,76 @@
 plugins {
     id 'java'
     id 'com.github.johnrengelman.shadow' version '1.2.3'
-    id "co.riiid.gradle" version "0.4.2"
+    id 'edu.sc.seis.launch4j' version '1.6.2'
 }
 
 apply plugin: 'java'
 apply plugin: 'idea'
+apply plugin: 'checkstyle'
 apply plugin: 'application'
 
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.9'
+    gradleVersion = '3.1'
 }
 
 repositories {
     mavenCentral()
-    maven { url "https://jitpack.io" }
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
+    compile fileTree(dir: 'lib', include: ['*.jar'])
     compile 'org.apache.pdfbox:pdfbox:2.0.1'
     compile 'org.bouncycastle:bcprov-jdk16:1.46'
     compile 'org.bouncycastle:bcmail-jdk16:1.46'
     compile 'com.github.thoqbk:traprange:c04fecc'
+    compile 'org.apache.logging.log4j:log4j-core:2.7'
 }
 
-mainClassName = "com.lwouis.labanquepostale_pdf_parser.Main"
+// How-to dev/run this project
+// ---------------------------
+// shadowJar -t: build the shadowJar + watch
+// runShadow: (build if not done through the watch) + run the shadowJar
+// launch4j: builds the launch4j directory which contains the .exe
 
-jar {
-    manifest { attributes "Main-Class": mainClassName }
-    doFirst {
-        from(configurations.runtime.resolve().collect { it.isDirectory() ? it : zipTree(it) }) {
-            exclude 'META-INF/MANIFEST.MF'
-            exclude 'META-INF/*.SF'
-            exclude 'META-INF/*.DSA'
-            exclude 'META-INF/*.RSA'
+mainClassName = 'com.lwouis.labanquepostale_pdf_parser.Main'
+
+launch4j {
+    copyConfigurable = project.tasks.shadowJar.outputs.files
+    jar = 'lib/' + project.tasks.shadowJar.archiveName
+}
+
+checkstyle {
+    toolVersion = '7.1.2'
+    configFile = rootProject.file('checkstyle.xml')
+}
+
+// Fail build on Checkstyle warnings
+// https://issues.gradle.org/browse/GRADLE-2888
+tasks.withType(Checkstyle).each { checkstyleTask ->
+    checkstyleTask.doLast {
+        reports.all { report ->
+            def outputFile = report.destination
+            if (outputFile.exists() && outputFile.text.contains("<error ")) {
+                throw new GradleException("There were checkstyle warnings! For more info check $outputFile")
+            }
         }
     }
 }
 
-github {
-    owner = 'lwouis'
-    repo = 'LaBanquePostalePdfParser'
-    token = githubToken
-    tagName = 'v1.0.0'
-    name = github.tagName
-    assets = [
-            'build/distributions/LaBanquePostalePdfParser.zip',
-            'build/libs/LaBanquePostalePdfParser.jar',
-    ]
+// forward system properties (e.g. headless=true) to the Java tests
+[test].each { runTask ->
+    configure(runTask) {
+        systemProperties System.properties
+    }
+}
+
+// show full stracktraces if a test throws an exception
+test {
+    testLogging {
+        exceptionFormat = 'full'
+    }
 }
 
 idea {

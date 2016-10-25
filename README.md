@@ -7,7 +7,13 @@ It is a workaround for the feature available on their website which only let's y
 
 # How to install
 
-
+1. Download/clone the project.
+2. Run `./gradlew shadowJar` to build `/build/libs/LaBanquePostalePdfParser-all.jar`
 
 # How to use
 
+1. Put all your PDF files in `/input/`.
+2. Either run `./gradlew runShadow` to run this JAR using your local Java installation,
+3. Or run `./gradlew launch4j` to build a Windows executable in `/build/launch4j/LaBanquePostalePdfParser.exe`, then 
+run it.
+4. Collect your result CSV file in `/output/`.

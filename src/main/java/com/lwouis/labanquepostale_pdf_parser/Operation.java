@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.util.Date;
 
-class Operation {
+public class Operation {
   private final Date date;
   private final BigDecimal amount;
   private String description;

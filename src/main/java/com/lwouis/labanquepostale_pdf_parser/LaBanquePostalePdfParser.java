@@ -17,14 +17,15 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.pdfbox.pdmodel.PDDocument;
+
 import com.giaybac.traprange.PDFTableExtractor;
 import com.giaybac.traprange.entity.Table;
 import com.giaybac.traprange.entity.TableCell;
 import com.giaybac.traprange.entity.TableRow;
 import com.google.common.primitives.Ints;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.pdfbox.pdmodel.PDDocument;
 
 class LaBanquePostalePdfParser {
 
@@ -201,14 +202,14 @@ class LaBanquePostalePdfParser {
   }
 
   private static String findYearOfTheOperations(List<TableRow> rows) {
-    Matcher m = YEAR_FORMAT.matcher(rows.get(0).toString());
+    Matcher matcher = YEAR_FORMAT.matcher(rows.get(0).toString());
     // year of the operations can be on line 0 or 1
-    if (!m.find()) {
+    if (!matcher.find()) {
       rows.remove(0);
-      m = YEAR_FORMAT.matcher(rows.get(0).toString());
-      m.find();
+      matcher = YEAR_FORMAT.matcher(rows.get(0).toString());
+      matcher.find();
     }
     rows.remove(0);
-    return m.group(1).replace(";", "");
+    return matcher.group(1).replace(";", "");
   }
 }
