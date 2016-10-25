@@ -9,7 +9,7 @@ addons:
     - oracle-java8-installer
 
 script:
-- ./gradlew build
+- ./gradlew shadowJar
 
 # These files changes at every build, and should not be cached
 # https://docs.travis-ci.com/user/languages/java/#Caching
